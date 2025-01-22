@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(45deg, black, grey, white);
+            background-size: 200% 200%;
+            animation: gradient 5s ease infinite;
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        input[type="number"] {
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            border: 2px solid #fff;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: border 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #ffeb3b;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            padding: 0.5rem 2rem;
+            font-size: 1.5rem;
+            background: #ffeb3b;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background: #ffd600;
+            transform: scale(1.05);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 1rem;
+        }
+
+        .password {
+            color: #ffeb3b;
+            font-weight: bold;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            background: #2196f3;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #1976d2;
+            transform: scale(1.05);
+        }
+
+        /* Custom alert styles */
+        .alert {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            color: black;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .alert.visible {
+            display: block;
+        }
+
+        .alert button {
+            background: #ffeb3b;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .alert button:hover {
+            background: #ffd600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Password Generator</h1>
+        <form onsubmit="return validateForm()">
+            <label>Enter the number of digits you want for the password:</label>
+            <input type="number" id="length" name="length" required>
+            <input type="submit" value="Generate">
+        </form>
+        <div id="result" style="display: none;">
+            <h2>Your generated password: <span class="password" id="generated-password"></span></h2>
+            <button class="copy-btn" onclick="copyPassword()">Copy</button>
+        </div>
+    </div>
+
+    <div class="alert" id="alert">
+        <p id="alert-message">Please enter a number greater than 0.</p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
+
+    <div class="alert" id="copy-alert">
+        <p id="copy-message">Password copied to clipboard!</p>
+        <button onclick="closeCopyAlert()">OK</button>
+    </div>
+
+    <script>
+        function validateForm() {
+            const lengthInput = document.getElementById('length');
+            const lengthValue = parseInt(lengthInput.value, 10);
+
+            if (lengthValue < 1) {
+                showAlert('Please enter a number greater than 0.');
+                return false; // Prevent form submission
+            }
+            generatePassword(lengthValue);
+            return false; // Prevent form submission to keep the page from refreshing
+        }
+
+        function generatePassword(length) {
+            const charset = "!@#$%^&*()_+[]{}|;:,.<>?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let password = "";
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            document.getElementById('generated-password').textContent = password;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function showAlert(message) {
+            const alert = document.getElementById('alert');
+            const alertMessage = document.getElementById('alert-message');
+            alertMessage.textContent = message;
+            alert.classList.add('visible');
+        }
+
+        function closeAlert() {
+            const alert = document.getElementById('alert');
+            alert.classList.remove('visible');
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('generated-password').textContent;
+            navigator.clipboard.writeText(password).then(() => {
+                showCopyAlert(); // Show copy success alert
+            }).catch(err => {
+                console.error('Error copying password: ', err);
+            });
+        }
+
+        function showCopyAlert() {
+            const copyAlert = document.getElementById('copy-alert');
+            copyAlert.classList.add('visible');
+        }
+
+        function closeCopyAlert() {
+            const copyAlert = document.getElementById('copy-alert');
+            copyAlert.classList.remove('visible');
+        }
+    </script>
+</body>
+
+</html>
